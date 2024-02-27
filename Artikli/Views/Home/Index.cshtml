@@ -1,0 +1,141 @@
+﻿@model IEnumerable<Artikli.Models.Artikal>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Artikli</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Popis artikala</h2>
+    <button id="dodajNoviButton">
+        Dodaj novi
+    </button>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Naziv</th>
+            <th>Kategorija</th>
+            <th>Cijena</th>
+        </tr>
+        @foreach (var artikal in Model)
+        {
+            <tr>
+                <td>@artikal.ID</td>
+                <td>@artikal.Naziv</td>
+                <td>@artikal.Kategorija</td>
+                <td>@artikal.Cijena</td>
+            </tr>
+        }
+    </table>
+
+    <div id="dodajNoviModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Novi artikal</h2>
+            <form id="noviArtikalForm">
+                <label for="naziv">Naziv:</label>
+                <input type="text" id="naziv" name="naziv"><br>
+
+                <label for="kategorija">Kategorija:</label>
+                <input type="text" id="kategorija" name="kategorija"><br>
+
+                <label for="cijena">Cijena:</label>
+                <input type="number" id="cijena" name="cijena"><br>
+
+                <input type="submit" value="Spremi">
+            </form>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            function openModal() {
+                $("#dodajNoviModal").css("display", "block");
+            }
+
+            function closeModal() {
+                $("#dodajNoviModal").css("display", "none");
+            }
+
+            $("#dodajNoviButton").click(function () {
+                openModal();
+            });
+
+            $(".close").click(function () {
+                closeModal();
+            });
+
+            $("#noviArtikalForm").submit(function (event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/SpremiArtikal",
+                    data: formData,
+                    success: function (response) {
+                        closeModal();
+                        window.location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Greška prilikom spremanja artikla: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
